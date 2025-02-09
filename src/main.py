@@ -20,8 +20,8 @@ def main():
     """
 
     # 1. Load Data
-    csv_path = "Survey Final.csv"
-    target_col = "Percieved Safety"
+    csv_path = "iris.csv"
+    target_col = "variety"
     X_train, X_test, y_train, y_test, feature_names = load_and_sample_data(csv_path, target_col)
 
     # 2. Choose a model
