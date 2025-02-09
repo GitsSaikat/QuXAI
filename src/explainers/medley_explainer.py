@@ -64,26 +64,61 @@ class MEDLEY:
 
     def _predict(self, X):
         """
-        Predict on classical X by converting or building kernel as needed.
+        Predict on input X by building the quantum representation for new models.
         """
-        if self.model_type == 'qrf':
-            X_q = self._encode_qrf(X)
+        import numpy as np
+        import pennylane as qml
+
+        # Define groups for different model types.
+        amplitude_models = ['qrf', 'qlogistic', 'qdt', 'qnb', 'qada', 'qgb', 'qlda', 'qperceptron', 'qridge', 'qextra']
+        kernel_models = ['qsvm', 'qsvc_poly']
+        
+        if self.model_type in amplitude_models:
+            num_qubits = self.pretrained_model.num_qubits
+            dev = qml.device("default.qubit", wires=num_qubits)
+
+            @qml.qnode(dev)
+            def circuit(x):
+                self.pretrained_model.quantum_feature_map(x, num_qubits)
+                return qml.state()
+            X_q = np.array([np.abs(circuit(x)) for x in X])
             return self.pretrained_model.predict(X_q)
 
-        elif self.model_type == 'qsvm':
-            if X.shape == self.X_ref_.shape and np.allclose(X, self.X_ref_):
-                # Reuse kernel
-                return self.pretrained_model.predict(self.kernel_ref_)
-            else:
-                return self._predict_kernel(X, is_knn=False)
+        elif self.model_type in kernel_models:
+            num_qubits = self.pretrained_model.num_qubits
+            dev = qml.device("default.qubit", wires=num_qubits)
+
+            @qml.qnode(dev)
+            def feature_map_circuit(x):
+                self.pretrained_model.quantum_feature_map(x, num_qubits)
+                return qml.state()
+                
+            def kernel_fn(x1, x2):
+                s1 = feature_map_circuit(x1)
+                s2 = feature_map_circuit(x2)
+                return np.abs(np.dot(s1.conj(), s2)) ** 2
+            
+            test_kernel = qml.kernels.kernel_matrix(X, self.X_ref_, kernel_fn)
+            return self.pretrained_model.predict(test_kernel)
 
         elif self.model_type == 'qknn':
-            if X.shape == self.X_ref_.shape and np.allclose(X, self.X_ref_):
-                dist_matrix = 1 - self.kernel_ref_
-                dist_matrix = np.abs(dist_matrix)
-                return self.pretrained_model.predict(dist_matrix)
-            else:
-                return self._predict_kernel(X, is_knn=True)
+            num_qubits = self.pretrained_model.num_qubits
+            dev = qml.device("default.qubit", wires=num_qubits)
+
+            @qml.qnode(dev)
+            def feature_map_circuit(x):
+                self.pretrained_model.quantum_feature_map(x, num_qubits)
+                return qml.state()
+
+            def kernel_fn(x1, x2):
+                s1 = feature_map_circuit(x1)
+                s2 = feature_map_circuit(x2)
+                return np.abs(np.dot(s1.conj(), s2)) ** 2
+
+            test_kernel = qml.kernels.kernel_matrix(X, self.X_ref_, kernel_fn)
+            dist_matrix = 1 - test_kernel
+            dist_matrix = np.abs(dist_matrix)
+            return self.pretrained_model.predict(dist_matrix)
 
         else:
             return self.pretrained_model.predict(X)

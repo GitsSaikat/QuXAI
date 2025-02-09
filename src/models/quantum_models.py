@@ -104,3 +104,169 @@ def train_qknn(X_train, y_train, feature_map=sample_quantum_feature_map, n_neigh
     knn.num_qubits = num_qubits
     knn.quantum_feature_map = feature_map
     return knn
+
+def train_qlogistic(X_train, y_train, feature_map=sample_quantum_feature_map):
+    # Quantum Logistic Regression using amplitude features
+    from sklearn.linear_model import LogisticRegression
+    num_qubits = X_train.shape[1]
+    dev = qml.device("default.qubit", wires=num_qubits)
+    @qml.qnode(dev)
+    def circuit(x):
+        feature_map(x, num_qubits)
+        return qml.state()
+    X_train_q = np.array([np.abs(circuit(x)) for x in X_train])
+    clf = LogisticRegression()
+    clf.fit(X_train_q, y_train)
+    clf.num_qubits = num_qubits
+    clf.quantum_feature_map = feature_map
+    return clf
+
+def train_qdt(X_train, y_train, feature_map=sample_quantum_feature_map):
+    # Quantum Decision Tree using amplitude features
+    from sklearn.tree import DecisionTreeClassifier
+    num_qubits = X_train.shape[1]
+    dev = qml.device("default.qubit", wires=num_qubits)
+    @qml.qnode(dev)
+    def circuit(x):
+        feature_map(x, num_qubits)
+        return qml.state()
+    X_train_q = np.array([np.abs(circuit(x)) for x in X_train])
+    clf = DecisionTreeClassifier()
+    clf.fit(X_train_q, y_train)
+    clf.num_qubits = num_qubits
+    clf.quantum_feature_map = feature_map
+    return clf
+
+def train_qnb(X_train, y_train, feature_map=sample_quantum_feature_map):
+    # Quantum Naive Bayes using amplitude features
+    from sklearn.naive_bayes import GaussianNB
+    num_qubits = X_train.shape[1]
+    dev = qml.device("default.qubit", wires=num_qubits)
+    @qml.qnode(dev)
+    def circuit(x):
+        feature_map(x, num_qubits)
+        return qml.state()
+    X_train_q = np.array([np.abs(circuit(x)) for x in X_train])
+    clf = GaussianNB()
+    clf.fit(X_train_q, y_train)
+    clf.num_qubits = num_qubits
+    clf.quantum_feature_map = feature_map
+    return clf
+
+def train_qada(X_train, y_train, feature_map=sample_quantum_feature_map):
+    # Quantum AdaBoost using amplitude features
+    from sklearn.ensemble import AdaBoostClassifier
+    num_qubits = X_train.shape[1]
+    dev = qml.device("default.qubit", wires=num_qubits)
+    @qml.qnode(dev)
+    def circuit(x):
+        feature_map(x, num_qubits)
+        return qml.state()
+    X_train_q = np.array([np.abs(circuit(x)) for x in X_train])
+    clf = AdaBoostClassifier()
+    clf.fit(X_train_q, y_train)
+    clf.num_qubits = num_qubits
+    clf.quantum_feature_map = feature_map
+    return clf
+
+def train_qgb(X_train, y_train, feature_map=sample_quantum_feature_map):
+    # Quantum Gradient Boosting using amplitude features
+    from sklearn.ensemble import GradientBoostingClassifier
+    num_qubits = X_train.shape[1]
+    dev = qml.device("default.qubit", wires=num_qubits)
+    @qml.qnode(dev)
+    def circuit(x):
+        feature_map(x, num_qubits)
+        return qml.state()
+    X_train_q = np.array([np.abs(circuit(x)) for x in X_train])
+    clf = GradientBoostingClassifier()
+    clf.fit(X_train_q, y_train)
+    clf.num_qubits = num_qubits
+    clf.quantum_feature_map = feature_map
+    return clf
+
+def train_qlda(X_train, y_train, feature_map=sample_quantum_feature_map):
+    # Quantum Linear Discriminant Analysis using amplitude features
+    from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+    num_qubits = X_train.shape[1]
+    dev = qml.device("default.qubit", wires=num_qubits)
+    @qml.qnode(dev)
+    def circuit(x):
+        feature_map(x, num_qubits)
+        return qml.state()
+    X_train_q = np.array([np.abs(circuit(x)) for x in X_train])
+    clf = LinearDiscriminantAnalysis()
+    clf.fit(X_train_q, y_train)
+    clf.num_qubits = num_qubits
+    clf.quantum_feature_map = feature_map
+    return clf
+
+def train_qperceptron(X_train, y_train, feature_map=sample_quantum_feature_map):
+    # Quantum Perceptron using amplitude features
+    from sklearn.linear_model import Perceptron
+    num_qubits = X_train.shape[1]
+    dev = qml.device("default.qubit", wires=num_qubits)
+    @qml.qnode(dev)
+    def circuit(x):
+        feature_map(x, num_qubits)
+        return qml.state()
+    X_train_q = np.array([np.abs(circuit(x)) for x in X_train])
+    clf = Perceptron()
+    clf.fit(X_train_q, y_train)
+    clf.num_qubits = num_qubits
+    clf.quantum_feature_map = feature_map
+    return clf
+
+def train_qridge(X_train, y_train, feature_map=sample_quantum_feature_map):
+    # Quantum Ridge Classifier using amplitude features
+    from sklearn.linear_model import RidgeClassifier
+    num_qubits = X_train.shape[1]
+    dev = qml.device("default.qubit", wires=num_qubits)
+    @qml.qnode(dev)
+    def circuit(x):
+        feature_map(x, num_qubits)
+        return qml.state()
+    X_train_q = np.array([np.abs(circuit(x)) for x in X_train])
+    clf = RidgeClassifier()
+    clf.fit(X_train_q, y_train)
+    clf.num_qubits = num_qubits
+    clf.quantum_feature_map = feature_map
+    return clf
+
+def train_qsvc_poly(X_train, y_train, feature_map=sample_quantum_feature_map):
+    # Quantum SVM with a polynomial kernel built from quantum fidelity
+    from sklearn.svm import SVC
+    num_qubits = X_train.shape[1]
+    dev = qml.device("default.qubit", wires=num_qubits)
+    
+    @qml.qnode(dev)
+    def feature_map_circuit(x):
+        feature_map(x, num_qubits)
+        return qml.state()
+    
+    def kernel_fn(x1, x2):
+        base = np.abs(np.dot(feature_map_circuit(x1).conj(), feature_map_circuit(x2))) ** 2
+        return (base + 1) ** 3  # polynomial kernel of degree 3
+
+    train_kernel = qml.kernels.square_kernel_matrix(X_train, kernel_fn)
+    clf = SVC(kernel='precomputed')
+    clf.fit(train_kernel, y_train)
+    clf.num_qubits = num_qubits
+    clf.quantum_feature_map = feature_map
+    return clf
+
+def train_qextra(X_train, y_train, feature_map=sample_quantum_feature_map):
+    # Quantum Extra Trees using amplitude features
+    from sklearn.ensemble import ExtraTreesClassifier
+    num_qubits = X_train.shape[1]
+    dev = qml.device("default.qubit", wires=num_qubits)
+    @qml.qnode(dev)
+    def circuit(x):
+        feature_map(x, num_qubits)
+        return qml.state()
+    X_train_q = np.array([np.abs(circuit(x)) for x in X_train])
+    clf = ExtraTreesClassifier()
+    clf.fit(X_train_q, y_train)
+    clf.num_qubits = num_qubits
+    clf.quantum_feature_map = feature_map
+    return clf
