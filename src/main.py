@@ -20,12 +20,12 @@ def main():
     """
 
     # 1. Load Data
-    csv_path = "winequality-white.csv"
-    target_col = "quality"
+    csv_path = "Survey Final.csv"
+    target_col = "Percieved Safety"
     X_train, X_test, y_train, y_test, feature_names = load_and_sample_data(csv_path, target_col)
 
     # 2. Choose a model
-    chosen_model_type = 'qridge'  # Options: qrf, qsvm, qknn, qlogistic, qdt, qnb, qada, qgb, qlda, qperceptron, qridge, qsvc_poly, qextra
+    chosen_model_type = 'qada'  # Options: qrf, qsvm, qknn, qlogistic, qdt, qnb, qada, qgb, qlda, qperceptron, qridge, qsvc_poly, qextra
     if chosen_model_type == 'qrf':
         model = train_qrf(X_train, y_train)
     elif chosen_model_type == 'qsvm':
