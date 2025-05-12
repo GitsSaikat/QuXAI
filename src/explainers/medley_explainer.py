@@ -154,7 +154,7 @@ class MEDLEY:
 
         baseline_acc = accuracy_score(self.y_ref_, self._predict(self.X_ref_))
 
-        # A) Drop-Column
+       
         drop_importances = []
         for i in range(self.num_features_):
             X_drop = self.X_ref_.copy()
@@ -162,7 +162,7 @@ class MEDLEY:
             drop_acc = accuracy_score(self.y_ref_, self._predict(X_drop))
             drop_importances.append(baseline_acc - drop_acc)
 
-        # B) Permutation
+       
         perm_importances = []
         for i in range(self.num_features_):
             scores = []
