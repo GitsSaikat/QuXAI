@@ -5,12 +5,6 @@ import pennylane as qml
 from sklearn.metrics import accuracy_score
 
 class MEDLEY:
-    """
-    A custom explainer that performs:
-      1) Drop-Column Importance
-      2) Permutation Importance
-    then combines the results.
-    """
 
     def __init__(self, pretrained_model, model_type, quantum_feature_map=None, n_repeats=5):
         self.pretrained_model = pretrained_model
