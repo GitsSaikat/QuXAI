@@ -248,7 +248,7 @@ def plot_comparison(results_df, top_k_value, plot_title_suffix=""):
     ax.legend(title="Explainers", bbox_to_anchor=(1.02, 1), loc='upper left')
     ax.grid(axis='y', linestyle='--', alpha=0.6)
     plt.tight_layout(rect=[0, 0, 0.85, 1]) # Adjusted rect to make space for legend
-    filename = f"explainer_recall_comparison_noisy_adjusted_treeshap_hatches{plot_title_suffix.replace(' ', '_')}.png"
+    filename = f"explainer_recall_comparison_noisy_adjusted{plot_title_suffix.replace(' ', '_')}.png"
     plt.savefig(filename, bbox_inches='tight')
     print(f"\nComparison plot saved as {filename}")
     plt.show()
