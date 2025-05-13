@@ -1,5 +1,3 @@
-# src/experiments/qmedley_on_amplitude_hqml_iris_noisy.py
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -8,13 +6,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
 
-# --- Scikit-learn Classifiers ---
 from sklearn.ensemble import (
     RandomForestClassifier, AdaBoostClassifier,
     GradientBoostingClassifier, ExtraTreesClassifier
 )
-# from sklearn.svm import SVC # Not needed now
-# from sklearn.neighbors import KNeighborsClassifier # Not needed now
 from sklearn.linear_model import (
     LogisticRegression, Perceptron, RidgeClassifier
 )
@@ -23,11 +18,10 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 
-# --- Pennylane for Quantum Operations ---
+
 import pennylane as qml
 from pennylane import numpy as pnp
 
-# --- MEDLEY Class (Original for HQML - no changes from previous correct version) ---
 class MEDLEY:
     def __init__(self, pretrained_model, model_type, quantum_feature_map=None, n_repeats=5):
         self.pretrained_model = pretrained_model
