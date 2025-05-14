@@ -17,10 +17,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
-
-
 import pennylane as qml
-from pennylane import numpy as pnp
 
 class MEDLEY:
     def __init__(self, pretrained_model, model_type, quantum_feature_map=None, n_repeats=5):
@@ -58,19 +55,19 @@ class MEDLEY:
             return qml.state()
 
         amplitude_models = ['qrf', 'qlogistic', 'qdt', 'qnb', 'qada', 'qgb', 'qlda', 'qperceptron', 'qridge', 'qextra']
-        kernel_models_direct = ['qsvm', 'qsvc_poly'] # Defined, but won't be used in this run
+        kernel_models_direct = ['qsvm', 'qsvc_poly']
 
         if model_type_local in amplitude_models:
             X_q = np.array([np.abs(q_node_for_prediction(x))**2 for x in X_perturbed])
             return model.predict(X_q)
-        elif model_type_local in kernel_models_direct: # Logic remains for completeness of MEDLEY class
+        elif model_type_local in kernel_models_direct:
             def kernel_fn_pred(x1, x2):
                 s1 = q_node_for_prediction(x1)
                 s2 = q_node_for_prediction(x2)
                 return np.abs(np.dot(s1.conj(), s2)) ** 2
             test_kernel_matrix = qml.kernels.kernel_matrix(X_perturbed, self.X_ref_, kernel_fn_pred)
             return model.predict(test_kernel_matrix)
-        elif model_type_local == 'qknn': # Logic remains for completeness of MEDLEY class
+        elif model_type_local == 'qknn':
             def kernel_fn_pred_knn(x1, x2):
                 s1 = q_node_for_prediction(x1)
                 s2 = q_node_for_prediction(x2)
@@ -103,12 +100,10 @@ class MEDLEY:
         final_importances = [(d + p) / 2.0 for d, p in zip(drop_importances, perm_importances)]
         return np.array(final_importances)
 
-# --- Quantum Feature Map ---
 def sample_quantum_feature_map(x, num_qubits):
     for i in range(num_qubits):
         qml.RX(float(x[i]), wires=i)
 
-# --- Simplified HQML Model Training Functions (Amplitude-Based Only) ---
 def _train_amplitude_model(X_train, y_train, classical_model_class, model_params, hqml_model_type_str, feature_map_func=sample_quantum_feature_map):
     num_qubits = X_train.shape[1]
     dev = qml.device("default.qubit", wires=num_qubits)
@@ -127,13 +122,13 @@ def _train_amplitude_model(X_train, y_train, classical_model_class, model_params
 def train_hqml_qrf(X_train, y_train, feature_map_func=sample_quantum_feature_map):
     return _train_amplitude_model(X_train, y_train, RandomForestClassifier, {'n_estimators': 50, 'random_state': 42, 'class_weight': 'balanced'}, 'qrf', feature_map_func)
 def train_hqml_qlogistic(X_train, y_train, feature_map_func=sample_quantum_feature_map):
-    return _train_amplitude_model(X_train, y_train, LogisticRegression, {'max_iter': 1000, 'random_state': 42, 'class_weight': 'balanced'}, 'qlogistic', feature_map_func)
+    return _train_amplitude_model(X_train, y_train, LogisticRegression, {'max_iter': 1000, 'random_state': 42, 'class_weight': 'balanced', 'solver':'liblinear'}, 'qlogistic', feature_map_func)
 def train_hqml_qdt(X_train, y_train, feature_map_func=sample_quantum_feature_map):
     return _train_amplitude_model(X_train, y_train, DecisionTreeClassifier, {'random_state': 42, 'class_weight': 'balanced'}, 'qdt', feature_map_func)
 def train_hqml_qnb(X_train, y_train, feature_map_func=sample_quantum_feature_map):
     return _train_amplitude_model(X_train, y_train, GaussianNB, {}, 'qnb', feature_map_func)
 def train_hqml_qada(X_train, y_train, feature_map_func=sample_quantum_feature_map):
-    return _train_amplitude_model(X_train, y_train, AdaBoostClassifier, {'n_estimators': 50, 'random_state': 42}, 'qada', feature_map_func)
+    return _train_amplitude_model(X_train, y_train, AdaBoostClassifier, {'n_estimators': 50, 'random_state': 42, 'algorithm':'SAMME'}, 'qada', feature_map_func)
 def train_hqml_qgb(X_train, y_train, feature_map_func=sample_quantum_feature_map):
     return _train_amplitude_model(X_train, y_train, GradientBoostingClassifier, {'n_estimators': 50, 'random_state': 42}, 'qgb', feature_map_func)
 def train_hqml_qlda(X_train, y_train, feature_map_func=sample_quantum_feature_map):
@@ -145,9 +140,6 @@ def train_hqml_qridge(X_train, y_train, feature_map_func=sample_quantum_feature_
 def train_hqml_qextra(X_train, y_train, feature_map_func=sample_quantum_feature_map):
     return _train_amplitude_model(X_train, y_train, ExtraTreesClassifier, {'n_estimators': 50, 'random_state': 42, 'class_weight': 'balanced'}, 'qextra', feature_map_func)
 
-# Kernel-Based Model training functions are now removed
-
-# --- Data Loading and Preprocessing ---
 def _add_noise_and_redundancy(X_orig, feature_names_orig, random_state=42):
     n_samples = X_orig.shape[0]
     rng = np.random.RandomState(random_state)
@@ -162,7 +154,7 @@ def _add_noise_and_redundancy(X_orig, feature_names_orig, random_state=42):
         primary_feat_idx = np.argmax(np.var(X_orig, axis=0)) if X_orig.shape[0] > 1 else 0
         primary_feat_for_redundancy = X_orig[:, primary_feat_idx].reshape(-1, 1)
         std_primary = np.std(primary_feat_for_redundancy) if X_orig.shape[0] > 1 else 1.0
-        redundant_feat = primary_feat_for_redundancy * 0.7 + rng.normal(0, 0.05 * std_primary, size=(n_samples, 1))
+        redundant_feat = primary_feat_for_redundancy * 0.7 + rng.normal(0, 0.05 * (std_primary if std_primary > 1e-9 else 0.1), size=(n_samples, 1))
         original_feat_name_short = feature_names_orig[primary_feat_idx]
         if len(original_feat_name_short) > 10:
             original_feat_name_short = original_feat_name_short[:7] + "..."
@@ -180,7 +172,6 @@ def load_and_prep_iris_noisy_for_hqml():
     X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3, random_state=42, stratify=y)
     return X_train, X_test, y_train, y_test, feature_names
 
-# --- Main Execution ---
 if __name__ == "__main__":
     print("Starting Q-MEDLEY application on Amplitude HQML models (Noisy Iris)...")
     X_train, X_test, y_train, y_test, feature_names = load_and_prep_iris_noisy_for_hqml()
@@ -196,12 +187,11 @@ if __name__ == "__main__":
         "Q.Perceptron": train_hqml_qperceptron,
         "Q.Ridge": train_hqml_qridge,
         "Q.ExtraTrees": train_hqml_qextra
-        # Kernel-based models (QSVM, QSVC_Poly, QKNN) are removed
     }
 
     all_medley_scores = {}
     N_REPEATS_MEDLEY = 3
-    FIGURE_COLS = 2 # Adjusted for 10 models (e.g., 2 cols x 5 rows or 3 cols x 4 rows)
+    FIGURE_COLS = 5
 
     print(f"\nApplying Q-MEDLEY (n_repeats={N_REPEATS_MEDLEY})...")
     for model_display_name, train_func in hqml_model_trainers.items():
@@ -234,32 +224,38 @@ if __name__ == "__main__":
         if num_models > 0:
             cols = FIGURE_COLS
             rows = (num_models + cols - 1) // cols
-
-            fig, axes = plt.subplots(rows, cols, figsize=(7 * cols, 4.5 * rows), squeeze=False)
+            
+            fig_width_per_col = 4
+            fig_height_per_row = 5
+            
+            fig, axes = plt.subplots(rows, cols, figsize=(fig_width_per_col * cols, fig_height_per_row * rows), squeeze=False)
             axes_flat = axes.flatten()
             sorted_model_names = sorted(all_medley_scores.keys())
 
             for i, model_name in enumerate(sorted_model_names):
-                scores = all_medley_scores[model_name]
-                ax = axes_flat[i]
-                y_pos = np.arange(len(feature_names))
-                ax.barh(y_pos, scores, align='center', color='skyblue', edgecolor='black')
-                ax.set_yticks(y_pos)
-                ax.set_yticklabels(feature_names, fontsize=8)
-                ax.invert_yaxis()
-                ax.set_xlabel('Q-MEDLEY Score', fontsize=9)
-                ax.set_title(model_name, fontsize=10)
-                ax.grid(axis='x', linestyle='--', alpha=0.7)
-                for spine in ax.spines.values():
-                    spine.set_linewidth(0.5)
+                if i < len(axes_flat):
+                    scores = all_medley_scores[model_name]
+                    ax = axes_flat[i]
+                    y_pos = np.arange(len(feature_names))
+                    ax.barh(y_pos, scores, align='center', color='skyblue', edgecolor='black')
+                    ax.set_yticks(y_pos)
+                    ax.set_yticklabels(feature_names, fontsize=8)
+                    ax.invert_yaxis()
+                    ax.set_xlabel('Q-MEDLEY Score', fontsize=9)
+                    ax.set_title(model_name, fontsize=10)
+                    ax.grid(axis='x', linestyle='--', alpha=0.7)
+                    for spine in ax.spines.values():
+                        spine.set_linewidth(0.5)
+                else:
+                    print(f"Warning: Not enough subplots for model {model_name}. Skipping.")
 
             for i in range(num_models, len(axes_flat)):
                 fig.delaxes(axes_flat[i])
 
-            fig.suptitle("Q-MEDLEY for Amplitude-Encoded HQML Models on Noisy Iris", fontsize=14, y=1.02 if rows >1 else 1.05)
+            fig.suptitle("Q-MEDLEY for Amplitude-Encoded HQML Models on Noisy Iris", fontsize=14, y=1.02 if rows > 1 else 1.05)
             plt.tight_layout(rect=[0, 0, 1, 0.98 if rows > 1 else 0.95])
-            plt.savefig("qmedley_amplitude_hqml_iris_noisy.png", dpi=150)
-            print("\nQ-MEDLEY comparison plot saved as qmedley_amplitude_hqml_iris_noisy.png")
+            plt.savefig("qmedley_amplitude_hqml_iris_noisy_5cols.png", dpi=150)
+            print("\nQ-MEDLEY comparison plot saved as qmedley_amplitude_hqml_iris_noisy_5cols.png")
             plt.show()
     else:
         print("No Q-MEDLEY scores were generated to plot.")
