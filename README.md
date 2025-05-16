@@ -1,6 +1,6 @@
 <h1 align="center">
   <a href="https://github.com/GitsSaikat/QuXAI">
-    <img src="figures/Logo.jpg" width="215" /></a><br>
+    <img src="logo.png" width="215" /></a><br>
   <b>QuXAI: Explainers for Hybrid Quantum Machine Learning Models 🔮</b><br>
   <b>Understanding Quantum ML Through Interpretability 🧬</b><br>
 </h1>
