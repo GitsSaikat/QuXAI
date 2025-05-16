@@ -13,7 +13,7 @@
 
 # QuXAI: Explainers for Hybrid Quantum Machine Learning Models
 
-QuXAI is a Python library that provides explanation methods for hybrid quantum-classical machine learning models. It helps in understanding and interpreting the decisions made by quantum ML models.
+QuXAI is a Python based framework that provides explanation methods for hybrid quantum-classical machine learning models. It helps in understanding and interpreting the decisions made by quantum ML models.
 
 ## Features
 
