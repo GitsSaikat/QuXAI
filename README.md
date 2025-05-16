@@ -2,7 +2,7 @@
   <a href="https://github.com/GitsSaikat/QuXAI">
     <img src="logo.png" width="215" /></a><br>
   <b>QuXAI: Explainers for Hybrid Quantum Machine Learning Models 🔮</b><br>
-  <b>Understanding Quantum ML Through Interpretability 🧬</b><br>
+  <h3><b>Understanding Quantum ML Through Interpretability 🧬</b></h3>
 </h1>
 
 <p align="center">
@@ -11,9 +11,8 @@
 </p>
 
 
-# QuXAI: Explainers for Hybrid Quantum Machine Learning Models
 
-QuXAI is a Python based framework that provides explanation methods for hybrid quantum-classical machine learning models. It helps in understanding and interpreting the decisions made by quantum ML models.
+QuXAI is a Python-based framework that provides explanation methods for hybrid quantum-classical machine learning models. It helps in understanding and interpreting the decisions made by quantum ML models.
 
 ## Features
 
@@ -53,7 +52,7 @@ explanations = explainer.explain(X_test)
   - `explainers/`: Implementation of explanation methods
   - `models/`: Quantum and hybrid model implementations
   - `plotting/`: Visualization utilities
-- `experiments/`: Experimental notebooks and scripts
+- `experiments/`: Experimental scripts
 - `data/`: Dataset files
 
 ## Requirements
