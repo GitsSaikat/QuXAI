@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "quxai"
+version = "0.1.0"
+description = "Explainability tools for Hybrid Quantum Machine Learning models"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "pennylane>=0.41",
+    "scikit-learn>=1.6",
+    "numpy>=2.0",
+    "pandas>=2.0",
+    "matplotlib>=3.9",
+    "shap>=0.46",
+    "scipy>=1.14",
+    "seaborn>=0.13",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "pytest-cov"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.setuptools.package-dir]
+"quxai" = "src"
